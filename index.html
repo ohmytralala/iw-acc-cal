@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1F4D3A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MIW Calculator" />
+  <meta name="application-name" content="MIW Calculator" />
+  <meta name="description" content="Illustrative Manulife Indexed Wealth projection calculator." />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="apple-touch-icon.png" />
+  <title>Manulife Indexed Wealth Projection Calculator</title>
+
+  <style>
+    :root{
+      --ml-green:#1F4D3A;
+      --ml-green-soft:#EEF4F1;
+      --ml-border:#DCE5E0;
+      --ml-row:#FAFBFA;
+      --text:#111111;
+      --muted:#6B7280;
+      --card:#F7F8F7;
+      --white:#FFFFFF;
+      --danger:#8A2F2F;
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      background:#F4F6F5;
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.4;
+    }
+
+    button,input{font:inherit}
+    button{cursor:pointer}
+
+    .page{
+      width:min(1120px, calc(100% - 28px));
+      margin:0 auto;
+      padding:28px 0 40px;
+    }
+
+    .stack{display:grid;gap:18px}
+    .panel{
+      background:var(--white);
+      border:1px solid var(--ml-border);
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+    .panel-pad{padding:22px}
+    .top-accent{height:8px;background:var(--ml-green)}
+    .header-row{
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .title-wrap{min-width:0;flex:1}
+    .app-title{
+      margin:0;
+      font-size:clamp(22px, 2.2vw, 29px);
+      line-height:1.15;
+      letter-spacing:-0.025em;
+      font-weight:700;
+    }
+    @media (min-width:760px){
+      .app-title{white-space:nowrap}
+    }
+    .subtitle{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .badge{
+      border:1px solid var(--ml-border);
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      white-space:nowrap;
+    }
+
+    h2,h3,p{margin-top:0}
+    .section-title{font-size:18px;margin:0;font-weight:700}
+    .section-subtitle{font-size:14px;color:var(--muted);margin:5px 0 0}
+
+    .inputs{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+      margin-top:16px;
+    }
+    @media(max-width:680px){.inputs{grid-template-columns:1fr}}
+
+    label span.label{
+      display:block;
+      margin-bottom:8px;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .input-shell{
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:0 14px;
+      border:1px solid var(--ml-border);
+      background:var(--card);
+      border-radius:12px;
+    }
+    .input-shell:focus-within{
+      border-color:var(--ml-green);
+      box-shadow:0 0 0 2px rgba(31,77,58,.12);
+    }
+    .affix{color:var(--muted)}
+    .number-input{
+      width:100%;
+      min-width:0;
+      border:0;
+      outline:0;
+      background:transparent;
+      padding:14px 0;
+      font-size:20px;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
+    }
+    @media(max-width:620px){.metrics{grid-template-columns:1fr}}
+    .metric{
+      border:1px solid var(--ml-border);
+      border-radius:14px;
+      padding:16px;
+      background:#fff;
+    }
+    .metric.primary{background:var(--ml-green-soft)}
+    .metric-label{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .metric-value{
+      margin-top:6px;
+      font-size:28px;
+      font-weight:700;
+    }
+    .metric.primary .metric-value{color:var(--ml-green)}
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+    .reset-btn{
+      min-height:44px;
+      border:1px solid var(--ml-border);
+      background:#fff;
+      color:#111;
+      border-radius:10px;
+      padding:0 16px;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .table-wrap{
+      margin-top:12px;
+      overflow-x:auto;
+      border:1px solid var(--ml-border);
+      border-radius:16px;
+      background:#fff;
+    }
+    table{
+      width:100%;
+      min-width:700px;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    thead{background:var(--ml-green);color:#fff}
+    th{
+      padding:14px 16px;
+      text-align:left;
+      font-weight:600;
+      white-space:nowrap;
+    }
+    th.num,td.num{text-align:right}
+    td{
+      padding:16px;
+      border-top:1px solid var(--ml-border);
+      white-space:nowrap;
+    }
+    tbody tr:nth-child(even){background:var(--ml-row)}
+    td.strong{font-weight:600}
+    tr.invalid{opacity:.45}
+    .subnote{font-size:12px;color:var(--muted);margin-top:3px}
+
+    details.panel summary{
+      list-style:none;
+      cursor:pointer;
+      padding:15px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      min-height:54px;
+      user-select:none;
+    }
+    details.panel summary::-webkit-details-marker{display:none}
+    details[open] summary{border-bottom:1px solid var(--ml-border)}
+    .summary-title{font-weight:700}
+    .action-pill{
+      background:var(--ml-green);
+      color:#fff;
+      border-radius:999px;
+      padding:6px 11px;
+      font-size:12px;
+      font-weight:600;
+      white-space:nowrap;
+    }
+    .details-body{padding:18px}
+    .year-row{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      gap:12px;
+    }
+    .year-input{
+      width:112px;
+      min-height:44px;
+      border:1px solid var(--ml-border);
+      background:var(--card);
+      border-radius:10px;
+      padding:0 12px;
+      font-weight:700;
+      outline:0;
+    }
+    .year-input:focus{
+      border-color:var(--ml-green);
+      box-shadow:0 0 0 2px rgba(31,77,58,.12);
+    }
+
+    .assumption-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+    @media(max-width:680px){.assumption-grid{grid-template-columns:1fr}}
+    .assumption-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:16px;
+    }
+    .assumption-card h4{
+      margin:0 0 12px;
+      font-size:14px;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:9px 16px;
+      font-size:14px;
+    }
+    .kv .k{color:var(--muted)}
+    .kv .v{text-align:right;font-weight:600}
+
+    .method-grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    @media(max-width:680px){.method-grid{grid-template-columns:1fr}}
+    .method{
+      border-left:4px solid var(--ml-green);
+      padding-left:12px;
+    }
+    .method .method-label{
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-size:12px;
+      font-weight:700;
+    }
+    .method p{margin:5px 0 0;font-size:14px}
+
+    .important{
+      border:1px solid var(--ml-border);
+      border-radius:12px;
+      background:#fff;
+      padding:14px 16px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .important strong{color:#111}
+
+    .validation{
+      margin:0;
+      color:var(--danger);
+      font-size:13px;
+      display:none;
+    }
+
+    @media(max-width:520px){
+      .page{width:min(100% - 18px,1120px);padding-top:12px}
+      .panel-pad{padding:18px}
+      .header-row{gap:10px}
+      .badge{display:none}
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="stack" id="miwApp">
+
+      <section class="panel">
+        <div class="top-accent"></div>
+        <div class="panel-pad">
+          <div class="header-row">
+            <div class="title-wrap">
+              <h1 class="app-title">Manulife Indexed Wealth Projection Calculator</h1>
+              <p class="subtitle">Illustrative growth projections based on your selected premium commitment and assumed average S&amp;P 500 return.</p>
+            </div>
+            <span class="badge">Illustrative</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-pad">
+        <h2 class="section-title">Set your scenario</h2>
+        <p class="section-subtitle">Adjust either input and the projections will update automatically.</p>
+
+        <div class="inputs">
+          <label>
+            <span class="label">Total Premium Commitment</span>
+            <div class="input-shell">
+              <span class="affix">S$</span>
+              <input id="totalPremium" class="number-input" type="number" min="0" step="1000" value="30000" inputmode="decimal" />
+            </div>
+          </label>
+
+          <label>
+            <span class="label">Estimated Average S&amp;P 500 Return</span>
+            <div class="input-shell">
+              <input id="estimatedReturn" class="number-input" type="number" min="-100" max="100" step="0.5" value="9" inputmode="decimal" />
+              <span class="affix">%</span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <div class="metric primary">
+          <div class="metric-label">Modelled MIW Credit</div>
+          <div class="metric-value" id="creditDisplay">9.00%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Upside Cap</div>
+          <div class="metric-value">9%</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Downside Buffer</div>
+          <div class="metric-value">10%</div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Estimated Policy Values</h2>
+            <p class="section-subtitle">Long-term illustration across the available premium payment options.</p>
+          </div>
+          <button class="reset-btn" type="button" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Payment Option</th>
+                <th>Annual Premium</th>
+                <th class="num">Year 5</th>
+                <th class="num">Year 10</th>
+                <th class="num">Year 15</th>
+                <th class="num">Year 20</th>
+              </tr>
+            </thead>
+            <tbody id="mainResults"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <details class="panel">
+        <summary>
+          <span class="summary-title">View a specific policy year</span>
+          <span class="action-pill">Year 1–40</span>
+        </summary>
+        <div class="details-body">
+          <div class="year-row">
+            <label>
+              <span class="label">Policy Year</span>
+              <input id="customYear" class="year-input" type="number" min="1" max="40" step="1" value="25" inputmode="numeric" />
+            </label>
+            <p class="section-subtitle" style="margin-bottom:9px">Enter any year from 1 to 40.</p>
+          </div>
+
+          <div class="table-wrap" style="margin-top:16px">
+            <table style="min-width:520px">
+              <thead>
+                <tr>
+                  <th>Payment Option</th>
+                  <th>Annual Premium</th>
+                  <th class="num" id="customYearHeading">Year 25</th>
+                </tr>
+              </thead>
+              <tbody id="customResults"></tbody>
+            </table>
+          </div>
+
+          <p id="longTermNote" class="section-subtitle" style="font-size:12px;margin-top:10px">
+            Longer-term values are illustrative and become increasingly sensitive to the assumed average return.
+          </p>
+        </div>
+      </details>
+
+      <details class="panel">
+        <summary>
+          <span class="summary-title">Assumptions &amp; methodology</span>
+          <span class="action-pill">View details</span>
+        </summary>
+
+        <div class="details-body">
+          <div class="assumption-grid">
+            <div class="assumption-card">
+              <h4>Minimum Annual Premium</h4>
+              <div class="kv">
+                <div class="k">Single Pay</div><div class="v">S$25,000</div>
+                <div class="k">3-Pay</div><div class="v">S$9,000</div>
+                <div class="k">5-Pay</div><div class="v">S$6,000</div>
+                <div class="k">10-Pay</div><div class="v">S$3,600</div>
+              </div>
+            </div>
+
+            <div class="assumption-card">
+              <h4>Policy Charge — Years 1 to 10</h4>
+              <div class="kv">
+                <div class="k">Single Pay</div><div class="v">0.85% p.a.</div>
+                <div class="k">3-Pay</div><div class="v">1.00% p.a.</div>
+                <div class="k">5-Pay</div><div class="v">1.10% p.a.</div>
+                <div class="k">10-Pay</div><div class="v">1.60% p.a.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="method-grid">
+            <div class="method">
+              <div class="method-label">Positive Return</div>
+              <p>Credited up to the 9% cap.</p>
+            </div>
+            <div class="method">
+              <div class="method-label">Negative Return</div>
+              <p>The first 10% decline is absorbed by the buffer.</p>
+            </div>
+            <div class="method">
+              <div class="method-label">After Year 10</div>
+              <p>Projection continues without the policy charge.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <section class="important">
+        <strong>Important:</strong> These values are simplified illustrations based on the assumptions selected and are not guaranteed policy benefits. Actual credited returns and policy values may differ. Please refer to the official product illustration and policy documents for full details.
+      </section>
+
+      <p id="validation" class="validation" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const totalInput = document.getElementById('totalPremium');
+      const returnInput = document.getElementById('estimatedReturn');
+      const customYearInput = document.getElementById('customYear');
+      const creditDisplay = document.getElementById('creditDisplay');
+      const mainResults = document.getElementById('mainResults');
+      const customResults = document.getElementById('customResults');
+      const customYearHeading = document.getElementById('customYearHeading');
+      const longTermNote = document.getElementById('longTermNote');
+      const validation = document.getElementById('validation');
+      const resetBtn = document.getElementById('resetBtn');
+
+      const plans = [
+        { label: 'Single Pay', years: 1, charge: 0.0085, minAnnual: 25000 },
+        { label: '3-Pay', years: 3, charge: 0.0100, minAnnual: 9000 },
+        { label: '5-Pay', years: 5, charge: 0.0110, minAnnual: 6000 },
+        { label: '10-Pay', years: 10, charge: 0.0160, minAnnual: 3600 }
+      ];
+
+      const checkpoints = [5, 10, 15, 20];
+
+      function money(value) {
+        return new Intl.NumberFormat('en-SG', {
+          style: 'currency',
+          currency: 'SGD',
+          maximumFractionDigits: 0
+        }).format(Math.max(0, Number.isFinite(value) ? value : 0));
+      }
+
+      function modelCredit(indexReturn) {
+        if (indexReturn >= 0) return Math.min(indexReturn, 9);
+        return Math.min(0, indexReturn + 10);
+      }
+
+      function simulate(total, plan, creditPct, maxYear) {
+        const annualPremium = total / plan.years;
+        let value = 0;
+        const values = {};
+
+        for (let year = 1; year <= maxYear; year++) {
+          if (year <= plan.years) value += annualPremium;
+          if (year <= 10) value *= (1 - plan.charge);
+          value *= (1 + creditPct / 100);
+          values[year] = value;
+        }
+
+        return { annualPremium, values };
+      }
+
+      function td(text, cls = '') {
+        const cell = document.createElement('td');
+        cell.textContent = text;
+        if (cls) cell.className = cls;
+        return cell;
+      }
+
+      function render() {
+        let total = Number(totalInput.value);
+        let assumedReturn = Number(returnInput.value);
+        let customYear = Math.round(Number(customYearInput.value));
+        let message = '';
+
+        if (!Number.isFinite(total) || total < 0) {
+          total = 0;
+          message = 'Please enter a valid non-negative premium.';
+        }
+
+        if (!Number.isFinite(assumedReturn)) {
+          assumedReturn = 0;
+          message = 'Please enter a valid estimated return.';
+        }
+
+        assumedReturn = Math.max(-100, Math.min(100, assumedReturn));
+
+        if (!Number.isFinite(customYear)) customYear = 1;
+        customYear = Math.max(1, Math.min(40, customYear));
+        customYearInput.value = customYear;
+        customYearHeading.textContent = `Year ${customYear}`;
+        longTermNote.style.display = customYear > 20 ? 'block' : 'none';
+
+        const credit = modelCredit(assumedReturn);
+        creditDisplay.textContent = `${credit.toFixed(2)}%`;
+
+        mainResults.innerHTML = '';
+        customResults.innerHTML = '';
+
+        plans.forEach(plan => {
+          const result = simulate(total, plan, credit, 40);
+          const valid = result.annualPremium >= plan.minAnnual;
+
+          const row = document.createElement('tr');
+          if (!valid) row.classList.add('invalid');
+
+          const labelCell = td(plan.label, 'strong');
+          if (!valid) {
+            const note = document.createElement('div');
+            note.className = 'subnote';
+            note.textContent = 'Below minimum premium';
+            labelCell.appendChild(note);
+          }
+
+          row.appendChild(labelCell);
+          row.appendChild(td(money(result.annualPremium), 'strong'));
+
+          checkpoints.forEach(year => {
+            row.appendChild(td(valid ? money(result.values[year]) : '—', 'num strong'));
+          });
+
+          mainResults.appendChild(row);
+
+          const customRow = document.createElement('tr');
+          if (!valid) customRow.classList.add('invalid');
+
+          const customLabelCell = td(plan.label, 'strong');
+          if (!valid) {
+            const note = document.createElement('div');
+            note.className = 'subnote';
+            note.textContent = 'Below minimum premium';
+            customLabelCell.appendChild(note);
+          }
+
+          customRow.appendChild(customLabelCell);
+          customRow.appendChild(td(money(result.annualPremium), 'strong'));
+          customRow.appendChild(td(valid ? money(result.values[customYear]) : '—', 'num strong'));
+          customResults.appendChild(customRow);
+        });
+
+        validation.textContent = message;
+        validation.style.display = message ? 'block' : 'none';
+      }
+
+      totalInput.addEventListener('input', render);
+      returnInput.addEventListener('input', render);
+      customYearInput.addEventListener('input', render);
+
+      resetBtn.addEventListener('click', () => {
+        totalInput.value = '30000';
+        returnInput.value = '9';
+        customYearInput.value = '25';
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
